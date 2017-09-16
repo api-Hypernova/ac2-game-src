@@ -766,6 +766,7 @@ namespace game
                    hits.length(), hits.length()*sizeof(hitmsg)/sizeof(int), hits.getbuf());
         }
 
+        if(!attacks[atk].automatic) d->attacking=ACT_IDLE;
         d->gunwait = attacks[atk].attackdelay;
         if(attacks[atk].action != ACT_SECONDARY && d->ai) d->gunwait += int(d->gunwait*(((101-d->skill)+rnd(111-d->skill))/100.f));
         d->totalshots += attacks[atk].damage*attacks[atk].rays;
