@@ -306,12 +306,7 @@ namespace game
 
     bool isheadshot(dynent *d, vec to)
     {
-        if ((to.z - (d->o.z - d->eyeheight)) / (d->eyeheight + d->aboveeye) > 0.8f) return true;
-        //conoutf(CON_GAMEINFO, "%f", to.z);
-        //conoutf(CON_GAMEINFO, "%f", d->o.z);
-        //if(to.z > d->o.z) return true;
-        //if(rnd(100)%2==0)return true;
-        //conoutf(CON_GAMEINFO, "First");
+        if ((to.z - (d->o.z - d->eyeheight)) / (d->eyeheight + d->aboveeye) > 0.9f) return true;
         return false;
     }
 
