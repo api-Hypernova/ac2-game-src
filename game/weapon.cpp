@@ -103,6 +103,7 @@ namespace game
         else if(s!=GUN_SHOTGUN && d->ammo[GUN_SHOTGUN])  s = GUN_SHOTGUN;
         else if(s!=GUN_M4 && d->ammo[GUN_M4])  s = GUN_M4;
         else if(s!=GUN_357 && d->ammo[GUN_357])  s = GUN_357;
+        else if(s!=GUN_PISTOL && d->ammo[GUN_PISTOL])  s = GUN_PISTOL;
         gunselect(s, d);
     }
 
@@ -627,8 +628,10 @@ namespace game
             case ATK_M4_PRIMARY:
             case ATK_357_PRIMARY:
             case ATK_357_SECONDARY:
+            case ATK_PISTOL_PRIMARY:
+            case ATK_PISTOL_SECONDARY:
             particle_splash(PART_SPARK, 200, 250, to, 0x50FF50, 0.45f);
-            particle_flare(hudgunorigin(gun, from, to, d), to, 500, PART_RAIL_TRAIL, 0x50FF50, 0.5f);
+            particle_flare(hudgunorigin(gun, from, to, d), to, 200, PART_RAIL_TRAIL, 0x50FF50, 0.5f);
             railhit(from, to);
             if(d->muzzle.x >= 0)
                 particle_flare(d->muzzle, d->muzzle, 140, PART_RAIL_MUZZLE_FLASH, 0x50FF50, 2.75f, d);
@@ -639,7 +642,7 @@ namespace game
             case ATK_SHOTGUN_SECONDARY:
                 particle_splash(PART_SPARK, 200, 250, to, 0x50CFE5, 0.45f);
                 loopi(attacks[atk].rays) {
-                    particle_flare(hudgunorigin(gun, from, rays[i], d), rays[i], 500, PART_RAIL_TRAIL, 0x50CFE5, 0.5f);
+                    particle_flare(hudgunorigin(gun, from, rays[i], d), rays[i], 200, PART_RAIL_TRAIL, 0x50CFE5, 0.5f);
                     railhit(from, rays[i]);
                 }
                 if(d->muzzle.x >= 0)
@@ -651,8 +654,8 @@ namespace game
                 break;
         }
 
-        if(d==hudplayer()) playsound(attacks[atk].hudsound, NULL);
-        else playsound(attacks[atk].sound, &d->o);
+        //if(d==hudplayer()) playsound(attacks[atk].hudsound, NULL);
+        playsound(attacks[atk].sound, d==hudplayer()?NULL:&d->o);
     }
 
     void particletrack(physent *owner, vec &o, vec &d)
