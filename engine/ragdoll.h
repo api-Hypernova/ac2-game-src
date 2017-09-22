@@ -437,11 +437,14 @@ void ragdolldata::constrain()
     }
 }
 
-FVAR(ragdollbodyfric, 0, 0.95f, 1);
+//FVAR(ragdollbodyfric, 0, 0.95f, 1);
+FVAR(ragdollbodyfric, 0, .7f, 1);
 FVAR(ragdollbodyfricscale, 0, 2, 10);
 FVAR(ragdollwaterfric, 0, 0.85f, 1);
-FVAR(ragdollgroundfric, 0, 0.8f, 1);
-FVAR(ragdollairfric, 0, 0.996f, 1);
+//FVAR(ragdollgroundfric, 0, 0.8f, 1);
+FVAR(ragdollgroundfric, 0, 1, 1);
+//FVAR(ragdollairfric, 0, 0.996f, 1);
+FVAR(ragdollairfric, 0, 1, 1);
 FVAR(ragdollunstick, 0, 10, 1e3f);
 VAR(ragdollexpireoffset, 0, 2500, 30000);
 VAR(ragdollwaterexpireoffset, 0, 4000, 30000);

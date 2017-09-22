@@ -128,7 +128,7 @@ namespace ai
                     case ATK_M4_SECONDARY:
                     case ATK_357_SECONDARY:
                         aiskew = 20; break;
-                    default: break;
+                    default: aiskew=5; break;
                 }
                 #define rndaioffset(r) ((rnd(int(r*aiskew*2)+1)-(r*aiskew))*(1.f/float(max(d->skill, 1))))
                 loopk(3) d->ai->aimrnd[k] = rndaioffset(e->radius);

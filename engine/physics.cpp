@@ -1774,7 +1774,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
     }
 
     vec d(m);
-    d.mul(pl->maxspeed*1.5f);
+    d.mul(pl->maxspeed*1.3f);
     if(pl->type==ENT_PLAYER)
     {
         if(floating)

@@ -410,7 +410,7 @@ namespace game
         }
         if(d==actor)
             conoutf(contype, "\f2%s suicided%s", dname, d==player1 ? "!" : "");
-        else if(isteam(d->team, actor->team))
+        /*else if(isteam(d->team, actor->team))
         {
             contype |= CON_TEAMKILL;
             if(actor==player1) conoutf(contype, "\f6%s fragged a teammate (%s)", aname, dname);
@@ -418,10 +418,11 @@ namespace game
             else conoutf(contype, "\f2%s fragged a teammate (%s)", aname, dname);
         }
         else
-        {
-            if(d==player1) conoutf(contype, "\f2%s got fragged by %s%s", dname, aname, actor->headshots?" with a headshot":"");
-            else conoutf(contype, "\f2%s %s %s%s", aname, guns[actor->gunselect].name, dname, actor->headshots?" with a headshot":"");
-        }
+        {*/
+            //if(d==player1) conoutf(contype, "\f2%s got fragged by %s%s", dname, aname, actor->headshots?" with a headshot":"");
+        else conoutf(contype, "\f2%s %s %s%s", aname, guns[actor->gunselect].name, dname, actor->headshots?" with a headshot":"");
+        //}
+
         deathstate(d);
         ai::killed(d, actor);
     }
@@ -706,6 +707,7 @@ namespace game
         if(d->state!=CS_DEAD)
         {
             draw_textf("%s", (HICON_X + 2*HICON_STEP + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, guns[d->gunselect].name);
+            //draw_textf("%s", (HICON_X + 2*HICON_STEP + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, d->ammo[d->gunselect]);
         }
 
         pophudmatrix();

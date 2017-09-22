@@ -282,9 +282,9 @@ namespace game
         vec p = d->o;
         p.z += 0.6f*(d->eyeheight + d->aboveeye) - d->eyeheight;
         //if(blood) particle_splash(PART_BLOOD, max(damage/10, rnd(3)+1), 1000, p, 0x60FFFF, 2.96f);
-#if 0
+//#if 0
         if(thirdperson) particle_textcopy(d->abovehead(), tempformatstring("%d", damage), PART_TEXT, 2000, 0xFF4B19, 4.0f, -8);
-#endif
+//#endif
     }
 
     void spawnbouncer(const vec &p, const vec &vel, gameent *d, int type)
@@ -379,10 +379,11 @@ namespace game
             if(o==at) damage /= EXP_SELFDAMDIV;
             if(damage > 0) hit(max(int(damage), 1), o, at, dir, atk, 0, dist);
             if(blood && qdam<800 && o->type==ENT_PLAYER && qdam) {
-                addstain(STAIN_BLOOD, o->o, vec(v).sub(o->o).normalize(), rnd(10)+5.f, bvec(0x99, 0xFF, 0xFF));
-                particle_splash(PART_BLOOD, 1, 200, v, 0x99FFFF, 8.f, 50, 0);
+                addstain(STAIN_BLOOD, o->o, vec(v).sub(o->o).normalize(), rnd(5)+5.f, bvec(0x99, 0xFF, 0xFF));
+                particle_splash(PART_BLOOD, 1, 200, v, 0x99FFFF, 5.f, 50, 0);
                 particle_splash(PART_WATER, 5, 500, v, 0xFF0000, 0.4f, 500);
             }
+            if(qdam && at==player1)conoutf(CON_GAMEINFO, "-%d", qdam);
         }
     }
 
@@ -562,9 +563,9 @@ namespace game
                     blooddest.z += rnd(2)+2;
                     shorten(from, rays[i], dist);
                     if(blood && d->type==ENT_PLAYER) {
-                        particle_splash(PART_BLOOD, 1, 200, rays[i], 0x99FFFF, 8.f, 50, 0);
+                        particle_splash(PART_BLOOD, 1, 200, rays[i], 0x99FFFF, 5.f, 50, 0);
                         particle_splash(PART_WATER, 5, 500, rays[i], 0xFF0000, 0.4f, 500);
-                        if(i%2==0)addstain(STAIN_BLOOD, blooddest, vec(from).sub(blooddest).normalize(), rnd(8)+13.f, bvec(0x99, 0xFF, 0xFF));
+                        if(i%2==0)addstain(STAIN_BLOOD, blooddest, vec(from).sub(blooddest).normalize(), rnd(5)+5.f, bvec(0x99, 0xFF, 0xFF));
                     }
                     if (d==player1 || d->ai) {
                         if(isheadshot(hits[i], rays[i])) {
@@ -594,9 +595,9 @@ namespace game
         {
             vec blooddest = to;
             shorten(from, to, dist);
-            particle_splash(PART_BLOOD, 1, 200, to, 0x99FFFF, 8.f, 50, 0);
+            particle_splash(PART_BLOOD, 1, 200, to, 0x99FFFF, 5.f, 50, 0);
             particle_splash(PART_WATER, 5, 500, to, 0xFF0000, 0.4f, 500);
-            addstain(STAIN_BLOOD, blooddest, vec(from).sub(blooddest).normalize(), rnd(8)+13.f, bvec(0x99, 0xFF, 0xFF));
+            addstain(STAIN_BLOOD, blooddest, vec(from).sub(blooddest).normalize(), rnd(5)+5.f, bvec(0x99, 0xFF, 0xFF));
             if (d==player1 || d->ai) {
                 if(isheadshot(o, to)) {
                     d->headshots++;
@@ -606,7 +607,7 @@ namespace game
             }
             hitpush(attacks[atk].damage, o, d, from, to, atk, 1);
         }
-        if(d==player1)conoutf(CON_GAMEINFO, "-%d", d->lastdamage);
+        if(d->lastdamage && d==player1)conoutf(CON_GAMEINFO, "-%d", d->lastdamage);
     }
 
     void shoteffects(int atk, const vec &from, const vec &to, gameent *d, bool local, int id, int prevaction)     // create visual effect from a shot
@@ -619,6 +620,7 @@ namespace game
         {
             case ATK_PULSE_SHOOT:
             case ATK_M4_SECONDARY:
+            case ATK_PULSERIFLE_SECONDARY:
                 if(d->muzzle.x >= 0)
                     particle_flare(d->muzzle, d->muzzle, 140, PART_PULSE_MUZZLE_FLASH, 0x50CFE5, 3.50f, d);
                 newprojectile(from, to, attacks[atk].projspeed, local, id, d, atk);
@@ -630,6 +632,7 @@ namespace game
             case ATK_357_SECONDARY:
             case ATK_PISTOL_PRIMARY:
             case ATK_PISTOL_SECONDARY:
+            case ATK_PULSERIFLE_PRIMARY:
             particle_splash(PART_SPARK, 200, 250, to, 0x50FF50, 0.45f);
             particle_flare(hudgunorigin(gun, from, to, d), to, 200, PART_RAIL_TRAIL, 0x50FF50, 0.5f);
             railhit(from, to);
