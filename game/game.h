@@ -358,7 +358,8 @@ struct gamestate
         //gunselect = GUN_RAIL;
         gunselect = GUN_M4;
         gunwait = 0;
-        loopi(NUMATKS) ammo[i] = attacks[i].spawnammo;
+        //loopi(NUMATKS) ammo[i] = attacks[i].spawnammo;
+        loopi(NUMATKS) ammo[i] = 9999;
     }
 
     void spawnstate(int gamemode)

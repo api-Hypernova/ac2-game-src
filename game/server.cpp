@@ -2170,7 +2170,7 @@ namespace server
            !validatk(atk))
             return;
         int gun = attacks[atk].gun;
-        if(gs.ammo[gun]<=0 || (attacks[atk].range && from.dist(to) > attacks[atk].range + 1))
+        if(/*gs.ammo[gun]<=0 ||*/ (attacks[atk].range && from.dist(to) > attacks[atk].range + 1))
             return;
         gs.ammo[gun] -= attacks[atk].use;
         gs.lastshot = millis;
