@@ -1273,7 +1273,7 @@ namespace game
         {
             int gun = getint(p);
             d->gunselect = clamp(gun, 0, NUMGUNS-1);
-            loopi(NUMGUNS) d->ammo[i] = getint(p);
+            loopi(NUMATKS) d->ammo[i] = getint(p);
         }
     }
 

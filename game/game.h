@@ -98,22 +98,24 @@ enum { ATK_RAIL_SHOOT = 0, ATK_RAIL_MELEE,
 #define validatk(n) ((n) >= 0 && (n) < NUMATKS)
 
 enum {
-    AMMO_PISTOL=0,
+    AMMO_NONE=0,
     AMMO_SHELLS,
     AMMO_PULSE,
     AMMO_556, //M4 ammo
+    AMMO_357,
     AMMO_9MM,
     AMMO_IMPACTNADE, //smg grenade
     AMMO_ORB,
     AMMO_ELECTROBOLT,
     AMMO_CELLS, //electrobolt lightning
     AMMO_SHOCK, //shockrifle
-
+    AMMO_MISSILE,
     NUMAMMOTYPES
 };
 
-enum
-{
+#define validammo(a) ((a) >= 0 && (a) < NUMAMMOTYPES)
+
+enum {
     M_TEAM       = 1<<0,
     M_CTF        = 1<<1,
     M_OVERTIME   = 1<<2,
@@ -123,6 +125,13 @@ enum
     M_LOBBY      = 1<<6,
     M_RAIL       = 1<<7,
     M_PULSE      = 1<<8
+};
+
+enum { //weapon mod flags
+    M_SILENCER=1<<0,
+    M_GRENADELAUNCHER=1<<1,
+    M_EXTENDEDMAG=1<<2,
+    M_SCOPE=1<<3
 };
 
 static struct gamemodeinfo
@@ -302,22 +311,22 @@ static struct itemstat { int add, max, sound; const char *name; int icon, info; 
 #define EXP_SELFPUSH 2.5f
 #define EXP_DISTSCALE 0.5f
 
-static const struct attackinfo { int gun, action, anim, vwepanim, hudanim, sound, attackdelay, damage, spread, margin, projspeed, kickamount, range, rays, hitpush, exprad, ttl, use, switch_when_empty, automatic, spawnammo; } attacks[NUMATKS] =
+static const struct attackinfo { int gun, action, anim, vwepanim, hudanim, sound, attackdelay, damage, spread, margin, projspeed, kickamount, range, rays, hitpush, exprad, ttl, use, switch_when_empty, automatic, spawnammo, amammotype, mods; } attacks[NUMATKS] =
 {
-    { GUN_RAIL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_RAIL1, 900, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, 10 },
-    { GUN_RAIL,  ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 0, 1, 1 },
-    { GUN_PULSE, ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSE1, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, 10 },
-    { GUN_PULSE, ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 1, 1 },
-    { GUN_SHOTGUN,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_PRIMARY, 500, 9, 150, 0,    0, 5, 2048, 6, 200,  0, 0, 0, 0, 1, 1 },
-    { GUN_SHOTGUN,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_SECONDARY, 900, 9, 150, 0,    0, 5, 2048, 12, 200,  0, 0, 0, 0, 1, 2 },
-    { GUN_M4,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_PRIMARY, 100, 23, 50, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, 20 },
-    { GUN_M4, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_SECONDARY, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, 3 },
-    { GUN_357,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_PRIMARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 12 },
-    { GUN_357,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_SECONDARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 12 },
-    { GUN_PISTOL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 18 },
-    { GUN_PISTOL,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL_SECONDARY, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 18 },
-    { GUN_PULSERIFLE,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE, 100, 26, 100, 0,    0, 10, 2048, 1, 200,  0, 0, 0, 0, 1, 30 },
-    { GUN_PULSERIFLE, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE_SECONDARY, 1000, 1000, 0, 1, 1000, 20, 1024, 1, 200, 30, 0, 0, 0, 1, 3 },
+    { GUN_RAIL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_RAIL1, 900, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, 10, AMMO_SHOCK, 0 },
+    { GUN_RAIL,  ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 0, 1, 1, AMMO_NONE, 0 },
+    { GUN_PULSE, ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSE1, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, 10, AMMO_ELECTROBOLT, 0 },
+    { GUN_PULSE, ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 1, 1, AMMO_CELLS, 0 },
+    { GUN_SHOTGUN,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_PRIMARY, 500, 9, 150, 0,    0, 5, 2048, 6, 200,  0, 0, 0, 0, 1, 1, AMMO_SHELLS, 0 },
+    { GUN_SHOTGUN,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_SECONDARY, 900, 9, 150, 0,    0, 5, 2048, 12, 200,  0, 0, 0, 0, 1, 2, AMMO_SHELLS, 0 },
+    { GUN_M4,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_PRIMARY, 100, 23, 50, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, 20, AMMO_556, 0 },
+    { GUN_M4, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_SECONDARY, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, 3, AMMO_IMPACTNADE, 0 },
+    { GUN_357,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_PRIMARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 12, AMMO_357, 0 },
+    { GUN_357,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_SECONDARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 12, AMMO_357, 0 },
+    { GUN_PISTOL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 18, AMMO_9MM, 0 },
+    { GUN_PISTOL,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL_SECONDARY, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 18, AMMO_9MM, 0 },
+    { GUN_PULSERIFLE,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE, 100, 26, 100, 0,    0, 10, 2048, 1, 200,  0, 0, 0, 0, 1, 30, AMMO_PULSE, 0 },
+    { GUN_PULSERIFLE, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE_SECONDARY, 1000, 1000, 0, 1, 1000, 20, 1024, 1, 200, 30, 0, 0, 0, 1, 3, AMMO_ORB, 0 },
 };
 
 static const struct guninfo { const char *name, *file, *vwep; int attacks[NUMACTS]; } guns[NUMGUNS] =
