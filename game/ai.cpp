@@ -85,7 +85,7 @@ namespace ai
     {
         if(attackrange(d, atk, e->o.squaredist(d->o)) && targetable(d, e))
             /*return d->ammo[attacks[atk].gun] > 0 && lastmillis - d->lastaction >= d->gunwait;*/
-            return d->ammo[atk] > 0 && lastmillis - d->lastaction >= d->gunwait;
+            return d->ammo[ATKAMMOTYPE(atk)] > 0 && lastmillis - d->lastaction >= d->gunwait;
         return false;
     }
 
@@ -402,9 +402,12 @@ namespace ai
 
     bool hasgoodammo(gameent *d)
     {
+#if 0
         static const int goodguns[] = { GUN_M4, GUN_SHOTGUN, GUN_PULSE, GUN_RAIL, GUN_357 };
         loopi(sizeof(goodguns)/sizeof(goodguns[0])) if(d->hasammo(goodguns[0])) return true;
         return false;
+#endif
+        return true;
     }
 
     void assist(gameent *d, aistate &b, vector<interest> &interests, bool all, bool force)

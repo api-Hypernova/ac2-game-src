@@ -113,7 +113,27 @@ enum {
     NUMAMMOTYPES
 };
 
+static struct _ammodata {
+    int add, max;
+    const char *icon;
+} ammodata[NUMAMMOTYPES] = { //index with enum above
+    { 1, 1, "infinite" }, //should allow an infinite number of each item? (that would be weird for the HUD rendering the number, but might be more realistic, especially for package drops)
+    { 6, 30, "shells" },
+    { 30, 90, "pulse" },
+    { 20, 40, "556" },
+    { 6, 24, "357" },
+    { 12, 48, "9mm" },
+    { 1, 10, "smgnade" },
+    { 1, 3, "orb" },
+    { 5, 30, "electrobolt" },
+    { 40, 120, "lightning" },
+    { 5, 15, "shock" },
+    { 1, 10, "rpg_missile" }
+};
+
 #define validammo(a) ((a) >= 0 && (a) < NUMAMMOTYPES)
+
+//we need not just a list of ammo types, but a list of pickups as well. It would be great to stop using the extentity system for the new Bullet-controlled pickups
 
 enum {
     M_TEAM       = 1<<0,
@@ -134,13 +154,19 @@ enum { //weapon mod flags
     M_SCOPE=1<<3
 };
 
+enum {
+    PLAYER_QUAD=1<<0,
+    PLAYER_LONGJUMP=1<<1,
+    PLAYER_REGENERATION=1<<2,
+    PLAYER_SHIELD=1<<3
+};
+
 static struct gamemodeinfo
 {
     const char *name, *prettyname;
     int flags;
     const char *info;
-} gamemodes[] =
-{
+} gamemodes[] = {
     { "demo", "Demo", M_DEMO | M_LOCAL, NULL},
     { "edit", "Edit", M_EDIT, "Cooperative Editing:\nEdit maps with multiple players simultaneously." },
     { "rdm", "rDM", M_LOBBY | M_RAIL, "Railgun Deathmatch:\nFrag everyone with railguns to score points." },
@@ -298,35 +324,30 @@ enum
     HICON_SPACE   = 40
 };
 
-#if 0
-static struct itemstat { int add, max, sound; const char *name; int icon, info; } itemstats[] =
-{
-};
-#endif
-
 #define validitem(n) false
 
 #define MAXRAYS 12
 #define EXP_SELFDAMDIV 2
 #define EXP_SELFPUSH 2.5f
 #define EXP_DISTSCALE 0.5f
+#define ATKAMMOTYPE(x) (attacks[(x)].ammotype)
 
-static const struct attackinfo { int gun, action, anim, vwepanim, hudanim, sound, attackdelay, damage, spread, margin, projspeed, kickamount, range, rays, hitpush, exprad, ttl, use, switch_when_empty, automatic, spawnammo, amammotype, mods; } attacks[NUMATKS] =
+static const struct attackinfo { int gun, action, anim, vwepanim, hudanim, sound, attackdelay, damage, spread, margin, projspeed, kickamount, range, rays, hitpush, exprad, ttl, use, switch_when_empty, automatic, ammotype, mods; } attacks[NUMATKS] =
 {
-    { GUN_RAIL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_RAIL1, 900, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, 10, AMMO_SHOCK, 0 },
-    { GUN_RAIL,  ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 0, 1, 1, AMMO_NONE, 0 },
-    { GUN_PULSE, ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSE1, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, 10, AMMO_ELECTROBOLT, 0 },
-    { GUN_PULSE, ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 1, 1, AMMO_CELLS, 0 },
-    { GUN_SHOTGUN,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_PRIMARY, 500, 9, 150, 0,    0, 5, 2048, 6, 200,  0, 0, 0, 0, 1, 1, AMMO_SHELLS, 0 },
-    { GUN_SHOTGUN,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_SECONDARY, 900, 9, 150, 0,    0, 5, 2048, 12, 200,  0, 0, 0, 0, 1, 2, AMMO_SHELLS, 0 },
-    { GUN_M4,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_PRIMARY, 100, 23, 50, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, 20, AMMO_556, 0 },
-    { GUN_M4, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_SECONDARY, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, 3, AMMO_IMPACTNADE, 0 },
-    { GUN_357,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_PRIMARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 12, AMMO_357, 0 },
-    { GUN_357,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_SECONDARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 12, AMMO_357, 0 },
-    { GUN_PISTOL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 18, AMMO_9MM, 0 },
-    { GUN_PISTOL,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL_SECONDARY, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, 18, AMMO_9MM, 0 },
-    { GUN_PULSERIFLE,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE, 100, 26, 100, 0,    0, 10, 2048, 1, 200,  0, 0, 0, 0, 1, 30, AMMO_PULSE, 0 },
-    { GUN_PULSERIFLE, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE_SECONDARY, 1000, 1000, 0, 1, 1000, 20, 1024, 1, 200, 30, 0, 0, 0, 1, 3, AMMO_ORB, 0 },
+    { GUN_RAIL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_RAIL1, 900, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, AMMO_SHOCK, 0 },
+    { GUN_RAIL,  ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 0, 1, AMMO_NONE, 0 },
+    { GUN_PULSE, ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSE1, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, AMMO_ELECTROBOLT, 0 },
+    { GUN_PULSE, ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 1, AMMO_NONE, 0 },
+    { GUN_SHOTGUN,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_PRIMARY, 500, 9, 150, 0,    0, 5, 2048, 6, 200,  0, 0, 0, 1, 0, AMMO_SHELLS, 0 },
+    { GUN_SHOTGUN,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_SECONDARY, 900, 9, 150, 0,    0, 5, 2048, 12, 200, 0, 0, 0, 1, 0, AMMO_SHELLS, 0 },
+    { GUN_M4,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_PRIMARY, 100, 23, 50, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, AMMO_556, 0 },
+    { GUN_M4, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_M4_SECONDARY, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, AMMO_IMPACTNADE, 0 },
+    { GUN_357,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_PRIMARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, AMMO_357, 0 },
+    { GUN_357,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_357_SECONDARY, 200, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, AMMO_357, 0 },
+    { GUN_PISTOL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, AMMO_9MM, 0 },
+    { GUN_PISTOL,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PISTOL_SECONDARY, 100, 21, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 0, AMMO_9MM, 0 },
+    { GUN_PULSERIFLE,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE, 100, 26, 100, 0,    0, 10, 2048, 1, 200,  0, 0, 0, 0, 1, AMMO_PULSE, 0 },
+    { GUN_PULSERIFLE, ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSERIFLE_SECONDARY, 1000, 1000, 0, 1, 1000, 20, 1024, 1, 200, 30, 0, 0, 0, 1, AMMO_ORB, 0 },
 };
 
 static const struct guninfo { const char *name, *file, *vwep; int attacks[NUMACTS]; } guns[NUMGUNS] =
@@ -345,10 +366,10 @@ static const struct guninfo { const char *name, *file, *vwep; int attacks[NUMACT
 // inherited by gameent and server clients
 struct gamestate
 {
-    int health, maxhealth;
-    int gunselect, gunwait;
-    int ammo[NUMATKS];
-    int aitype, skill;
+    int health, maxhealth,
+        gunselect, gunwait,
+        ammo[NUMAMMOTYPES],
+        aitype, skill;
 
     gamestate() : maxhealth(100), aitype(AI_NONE), skill(0) {}
 
@@ -367,8 +388,7 @@ struct gamestate
         //gunselect = GUN_RAIL;
         gunselect = GUN_M4;
         gunwait = 0;
-        //loopi(NUMATKS) ammo[i] = attacks[i].spawnammo;
-        loopi(NUMATKS) ammo[i] = 9999;
+        loopi(NUMAMMOTYPES) ammo[i] = ammodata[i].add;
     }
 
     void spawnstate(int gamemode)
@@ -398,23 +418,12 @@ struct gamestate
         return damage;
     }
 
-#if 0
-    int hasammo(int gun, int exclude = -1)
+    bool hasammo(int gun, int exclude = -1)
     {
-        std::vector<int> atksforthisgun(NUMATKS);
-        //build list of attacks for this gun
-        loopi(gun[attacks]) {
-            atksforthisgun.push_back(guns[gun].attacks[i]);
+        loopi(ARRSIZE(guns[gun].attacks)) {
+            if(ammo[guns[gun].attacks[i]]) return validgun(gun) && gun != exclude;
         }
-        //check if any of these attacks have ammo
-        bool hasammo = false;
-
-        return validgun(gun) && gun != exclude && hasammo;
-    }
-#endif
-
-    int hasammo(int gun, int exclude = -1) {
-        return true;
+        return false;
     }
 };
 

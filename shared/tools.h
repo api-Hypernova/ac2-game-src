@@ -130,6 +130,8 @@ static inline int bitscan(uint mask)
 #define SQRT5 (2.23606797749979f)
 #define RAD (PI / 180.0f)
 
+#define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
+
 #ifdef WIN32
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
