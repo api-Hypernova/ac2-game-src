@@ -455,7 +455,7 @@ namespace game
         if(!previewent)
         {
             previewent = new gameent;
-            loopi(NUMGUNS) previewent->ammo[i] = 1;
+            loopi(NUMAMMOTYPES) previewent->ammo[i] = 1;
         }
         float height = previewent->eyeheight + previewent->aboveeye,
               zrad = height/2;

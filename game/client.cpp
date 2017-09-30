@@ -1273,7 +1273,7 @@ namespace game
         {
             int gun = getint(p);
             d->gunselect = clamp(gun, 0, NUMGUNS-1);
-            loopi(NUMATKS) d->ammo[i] = getint(p);
+            loopi(NUMAMMOTYPES) d->ammo[i] = getint(p);
         }
     }
 
@@ -1534,7 +1534,7 @@ namespace game
                 if(!s || !validatk(atk)) break;
                 int gun = attacks[atk].gun;
                 s->gunselect = gun;
-                s->ammo[atk] -= attacks[atk].use;
+                s->ammo[ATKAMMOTYPE(atk)] -= attacks[atk].use;
                 s->gunwait = attacks[atk].attackdelay;
                 int prevaction = s->lastaction;
                 s->lastaction = lastmillis;

@@ -20,8 +20,8 @@ namespace game
 #if 0
     #define MINDEBRIS 3
     VARP(maxdebris, MINDEBRIS, 10, 100);
-    VARP(maxgibs, 0, 4, 100);
 #endif
+    VARP(maxgibs, 0, 4, 100);
 
     ICOMMAND(getweapon, "", (), intret(player1->gunselect));
 
@@ -43,7 +43,7 @@ namespace game
         loopi(NUMGUNS)
         {
             gun = (gun + dir)%NUMGUNS;
-            if(force || player1->ammo[gun]) break;
+            if(force || player1->hasammo(gun)) break;
         }
         if(gun != player1->gunselect) gunselect(gun, player1);
         else playsound(S_NOAMMO);
@@ -65,8 +65,8 @@ namespace game
     {
         int gun = getweapon(name);
         if(player1->state!=CS_ALIVE || !validgun(gun)) return;
-        if(force || player1->ammo[gun]) gunselect(gun, player1);
-        else playsound(S_NOAMMO);
+       /* if(force || player1->hasammo(gun))*/ gunselect(gun, player1);
+        /*else*/ playsound(S_NOAMMO);
     }
     ICOMMAND(setweapon, "si", (char *name, int *force), setweapon(name, *force!=0));
 
@@ -78,7 +78,7 @@ namespace game
         loopi(numguns)
         {
             int gun = guns[(i+offset)%numguns];
-            if(gun>=0 && gun<NUMGUNS && (force || player1->ammo[gun]))
+            if(gun>=0 && gun<NUMGUNS && (force || player1->hasammo(gun)))
             {
                 gunselect(gun, player1);
                 return;
@@ -98,12 +98,12 @@ namespace game
     {
         if(d->state!=CS_ALIVE) return;
         int s = d->gunselect;
-        if(s!=GUN_PULSE && d->ammo[GUN_PULSE])     s = GUN_PULSE;
-        else if(s!=GUN_RAIL && d->ammo[GUN_RAIL])  s = GUN_RAIL;
-        else if(s!=GUN_SHOTGUN && d->ammo[GUN_SHOTGUN])  s = GUN_SHOTGUN;
-        else if(s!=GUN_M4 && d->ammo[GUN_M4])  s = GUN_M4;
-        else if(s!=GUN_357 && d->ammo[GUN_357])  s = GUN_357;
-        else if(s!=GUN_PISTOL && d->ammo[GUN_PISTOL])  s = GUN_PISTOL;
+        if(s!=GUN_PULSE && d->hasammo(GUN_PULSE))     s = GUN_PULSE;
+        else if(s!=GUN_RAIL && d->hasammo(GUN_RAIL))  s = GUN_RAIL;
+        else if(s!=GUN_SHOTGUN && d->hasammo(GUN_SHOTGUN))  s = GUN_SHOTGUN;
+        else if(s!=GUN_M4 && d->hasammo(GUN_M4))  s = GUN_M4;
+        else if(s!=GUN_357 && d->hasammo(GUN_357))  s = GUN_357;
+        else if(s!=GUN_PISTOL && d->hasammo(GUN_PISTOL))  s = GUN_PISTOL;
         gunselect(s, d);
     }
 
@@ -116,7 +116,7 @@ namespace game
             if(name[0])
             {
                 int gun = getweapon(name);
-                if(validgun(gun) && gun != player1->gunselect && player1->ammo[gun]) { gunselect(gun, player1); return; }
+                if(validgun(gun) && gun != player1->gunselect && player1->hasammo(gun)) { gunselect(gun, player1); return; }
             } else { weaponswitch(player1); return; }
         }
         playsound(S_NOAMMO);
@@ -281,10 +281,14 @@ namespace game
     {
         vec p = d->o;
         p.z += 0.6f*(d->eyeheight + d->aboveeye) - d->eyeheight;
-        //if(blood) particle_splash(PART_BLOOD, max(damage/10, rnd(3)+1), 1000, p, 0x60FFFF, 2.96f);
 #if 0
         if(thirdperson) particle_textcopy(d->abovehead(), tempformatstring("%d", damage), PART_TEXT, 2000, 0xFF4B19, 4.0f, -8);
 #endif
+
+        if(d==player1 && damage) {
+            float droll = damage/1.9f;
+            player1->roll += player1->roll>0 ? droll : (player1->roll<0 ? -droll : (rnd(2) ? droll : -droll));
+        }
     }
 
     void spawnbouncer(const vec &p, const vec &vel, gameent *d, int type)
@@ -298,11 +302,11 @@ namespace game
 
     void gibeffect(int damage, const vec &vel, gameent *d)
     {
-#if 0
+//#if 0
         if(!blood || !maxgibs || damage < 0) return;
         vec from = d->abovehead();
         loopi(rnd(maxgibs)+1) spawnbouncer(from, vel, d, BNC_GIBS);
-#endif
+//#endif
     }
 
     bool isheadshot(dynent *d, vec to)
@@ -724,18 +728,18 @@ namespace game
         int gun = d->gunselect, act = d->attacking, atk = guns[gun].attacks[act];
         d->lastaction = lastmillis;
         d->lastattack = atk;
-        if(!d->ammo[gun])
+        if(!(d->ammo[ATKAMMOTYPE(atk)] - attacks[atk].use))
         {
             if(d==player1)
             {
                 msgsound(S_NOAMMO, d);
                 d->gunwait = 600;
                 d->lastattack = -1;
-                weaponswitch(d);
+                //weaponswitch(d);
             }
             return;
         }
-        //d->ammo[gun] -= attacks[atk].use;
+        d->ammo[ATKAMMOTYPE(atk)] -= attacks[atk].use;
 
         vec from = d->o, to = targ, dir = vec(to).sub(from).safenormalize();
         float dist = to.dist(from);
@@ -785,15 +789,15 @@ namespace game
         }
     }
 
-#if 0
     static const char * const gibnames[3] = { "gibs/gib01", "gibs/gib02", "gibs/gib03" };
+#if 0
     static const char * const debrisnames[4] = { "debris/debris01", "debris/debris02", "debris/debris03", "debris/debris04" };
 #endif
 
     void preloadbouncers()
     {
-#if 0
         loopi(sizeof(gibnames)/sizeof(gibnames[0])) preloadmodel(gibnames[i]);
+#if 0
         loopi(sizeof(debrisnames)/sizeof(debrisnames[0])) preloadmodel(debrisnames[i]);
 #endif
     }
@@ -821,8 +825,8 @@ namespace game
             if(bnc.lifetime < 250) fade = bnc.lifetime/250.0f;
             switch(bnc.bouncetype)
             {
-#if 0
                 case BNC_GIBS: mdl = gibnames[bnc.variant]; break;
+#if 0
                 case BNC_DEBRIS: mdl = debrisnames[bnc.variant]; break;
 #endif
                 default: continue;

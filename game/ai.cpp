@@ -92,7 +92,7 @@ namespace ai
     bool canshoot(gameent *d, int atk)
     {
         /*return !d->ai->becareful && d->ammo[attacks[atk].gun] > 0 && lastmillis - d->lastaction >= d->gunwait;*/
-        return !d->ai->becareful && d->ammo[atk] > 0 && lastmillis - d->lastaction >= d->gunwait;
+        return !d->ai->becareful && (d->ammo[ATKAMMOTYPE(atk)] - attacks[atk].use > 0) && lastmillis - d->lastaction >= d->gunwait;
     }
 
     bool hastarget(gameent *d, int atk, aistate &b, gameent *e, float yaw, float pitch, float dist)

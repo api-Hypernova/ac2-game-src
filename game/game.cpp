@@ -702,12 +702,17 @@ namespace game
     void drawhudicons(gameent *d)
     {
         pushhudscale(2);
-
         draw_textf("%s%d", (HICON_X + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, d->health>51?"":(d->health>26?"\f2":"\f3"), d->state==CS_DEAD ? 0 : d->health);
         if(d->state!=CS_DEAD)
         {
             draw_textf("%s", (HICON_X + 2*HICON_STEP + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, guns[d->gunselect].name);
-            //draw_textf("%s", (HICON_X + 2*HICON_STEP + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, d->ammo[d->gunselect]);
+
+            char hudstr[20];
+            loopi(ARRSIZE(guns[d->gunselect].attacks)) {
+                concformatstring(hudstr, "%d|", d->ammo[ATKAMMOTYPE(guns[d->gunselect].attacks[i])]);
+            }
+            concatstring(hudstr, "\0");
+            draw_textf("%s", (HICON_X + 4*HICON_STEP + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, hudstr);
         }
 
         pophudmatrix();
