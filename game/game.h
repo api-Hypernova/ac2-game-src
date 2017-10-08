@@ -420,9 +420,11 @@ struct gamestate
 
     bool hasammo(int gun, int exclude = -1)
     {
+        //conoutf(CON_GAMEINFO, "Calling player->hasammo(%d, %d", gun, exclude);
         loopi(ARRSIZE(guns[gun].attacks)) {
-            if(ammo[guns[gun].attacks[i]]) return validgun(gun) && gun != exclude;
+            if(ammo[guns[gun].attacks[i]] && printf("Returning TRUE.")) return validgun(gun) && gun != exclude;
         }
+        //conoutf(CON_GAMEINFO, "Returning FALSE.");
         return false;
     }
 };
@@ -650,7 +652,7 @@ namespace game
     extern void explode(bool local, gameent *owner, const vec &v, const vec &vel, dynent *safe, int dam, int atk);
     extern void explodeeffects(int atk, gameent *d, bool local, int id = 0);
     extern void damageeffect(int damage, gameent *d, bool thirdperson = true);
-    extern void gibeffect(int damage, const vec &vel, gameent *d);
+    extern void gibeffect(int damage, vec from, gameent *d);
     extern float intersectdist;
     extern bool intersect(dynent *d, const vec &from, const vec &to, float margin = 0, float &dist = intersectdist);
     extern dynent *intersectclosest(const vec &from, const vec &to, gameent *at, float margin = 0, float &dist = intersectdist);

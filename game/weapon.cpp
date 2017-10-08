@@ -21,7 +21,7 @@ namespace game
     #define MINDEBRIS 3
     VARP(maxdebris, MINDEBRIS, 10, 100);
 #endif
-    VARP(maxgibs, 0, 4, 100);
+    VARP(numgibs, 0, 4, 100);
 
     ICOMMAND(getweapon, "", (), intret(player1->gunselect));
 
@@ -65,8 +65,8 @@ namespace game
     {
         int gun = getweapon(name);
         if(player1->state!=CS_ALIVE || !validgun(gun)) return;
-       /* if(force || player1->hasammo(gun))*/ gunselect(gun, player1);
-        /*else*/ playsound(S_NOAMMO);
+        /*if(force || player1->hasammo(gun))*/ { gunselect(gun, player1); return; }
+        playsound(S_NOAMMO);
     }
     ICOMMAND(setweapon, "si", (char *name, int *force), setweapon(name, *force!=0));
 
@@ -178,7 +178,7 @@ namespace game
         switch(type)
         {
             case BNC_DEBRIS: bnc.variant = rnd(4); break;
-            case BNC_GIBS: bnc.variant = rnd(3); break;
+            case BNC_GIBS: bnc.variant = rnd(1); break;
         }
 
         vec dir(to);
@@ -291,22 +291,20 @@ namespace game
         }
     }
 
-    void spawnbouncer(const vec &p, const vec &vel, gameent *d, int type)
+    void spawnbouncer(const vec &p, gameent *d, int type)
     {
         vec to(rnd(100)-50, rnd(100)-50, rnd(100)-50);
         if(to.iszero()) to.z += 1;
         to.normalize();
         to.add(p);
-        newbouncer(p, to, true, 0, d, type, rnd(1000)+1000, rnd(100)+20);
+        newbouncer(p, to, true, 0, d, type, rnd(5000)+1000, rnd(100)+20);
     }
 
-    void gibeffect(int damage, const vec &vel, gameent *d)
+    void gibeffect(int damage, vec from, gameent *d)
     {
-//#if 0
-        if(!blood || !maxgibs || damage < 0) return;
-        vec from = d->abovehead();
-        loopi(rnd(maxgibs)+1) spawnbouncer(from, vel, d, BNC_GIBS);
-//#endif
+        if(!blood || !numgibs || damage < 0) return;
+        loopi(numgibs) spawnbouncer(from, d, BNC_GIBS);
+        conoutf(CON_GAMEINFO, "Spawned %d gibs...", numgibs);
     }
 
     bool isheadshot(dynent *d, vec to)
@@ -384,8 +382,9 @@ namespace game
             if(damage > 0) hit(max(int(damage), 1), o, at, dir, atk, 0, dist);
             if(blood && qdam<800 && o->type==ENT_PLAYER && qdam) {
                 addstain(STAIN_BLOOD, o->o, vec(v).sub(o->o).normalize(), rnd(5)+5.f, bvec(0x99, 0xFF, 0xFF));
-                particle_splash(PART_BLOOD, 1, 200, v, 0x99FFFF, 5.f, 50, 0);
+                particle_splash(PART_BLOOD, 1, 200, v, 0x99FFFF, 10.f, 50, 0);
                 particle_splash(PART_WATER, 5, 500, v, 0xFF0000, 0.4f, 500);
+                //gibeffect(qdam, v, (gameent*)o);
             }
             if(qdam && at==player1)conoutf(CON_GAMEINFO, "-%d", qdam);
         }
@@ -404,7 +403,7 @@ namespace game
         {
             vec debrisvel = vec(vel).neg();
             loopi(numdebris)
-                spawnbouncer(debrisorigin, debrisvel, owner, BNC_DEBRIS);
+                spawnbouncer(debrisorigin, owner, BNC_DEBRIS);
         }
 #endif
         if(!local) return;
@@ -570,6 +569,7 @@ namespace game
                         particle_splash(PART_BLOOD, 1, 200, rays[i], 0x99FFFF, 5.f, 50, 0);
                         particle_splash(PART_WATER, 5, 500, rays[i], 0xFF0000, 0.4f, 500);
                         if(i%2==0)addstain(STAIN_BLOOD, blooddest, vec(from).sub(blooddest).normalize(), rnd(5)+5.f, bvec(0x99, 0xFF, 0xFF));
+                        //gibeffect(attacks[atk].damage, rays[i], NULL);
                     }
                     if (d==player1 || d->ai) {
                         if(isheadshot(hits[i], rays[i])) {
@@ -609,6 +609,7 @@ namespace game
                 }
                 else d->lastdamage+=attacks[atk].damage;
             }
+            //gibeffect(attacks[atk].damage, to, d);
             hitpush(attacks[atk].damage, o, d, from, to, atk, 1);
         }
         if(d->lastdamage && d==player1)conoutf(CON_GAMEINFO, "-%d", d->lastdamage);

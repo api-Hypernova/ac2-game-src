@@ -1659,7 +1659,7 @@ namespace server
         putint(p, gs.health);
         putint(p, gs.maxhealth);
         putint(p, gs.gunselect);
-        loopi(NUMGUNS) putint(p, gs.ammo[i]);
+        loopi(NUMAMMOTYPES) putint(p, gs.ammo[i]);
     }
 
     void spawnstate(clientinfo *ci)
@@ -2169,10 +2169,10 @@ namespace server
            wait<gs.gunwait ||
            !validatk(atk))
             return;
-        int gun = attacks[atk].gun;
-        if(gs.ammo[gun]<=0 || (attacks[atk].range && from.dist(to) > attacks[atk].range + 1))
+        int ammotype = attacks[atk].ammotype;
+        if((gs.ammo[ammotype]-attacks[atk].use<0) || (attacks[atk].range && from.dist(to) > attacks[atk].range + 1))
             return;
-        gs.ammo[gun] -= attacks[atk].use;
+        gs.ammo[ammotype] -= attacks[atk].use;
         gs.lastshot = millis;
         gs.gunwait = attacks[atk].attackdelay;
         sendf(-1, 1, "rii9x", N_SHOTFX, ci->clientnum, atk, id,
