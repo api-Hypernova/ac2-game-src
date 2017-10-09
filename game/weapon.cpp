@@ -375,6 +375,7 @@ namespace game
         if(o->state!=CS_ALIVE) return;
         vec dir;
         float dist = projdist(o, dir, v, vel);
+        at->headshots=0;
         if(dist<attacks[atk].exprad)
         {
             float damage = qdam*(1-dist/EXP_DISTSCALE/attacks[atk].exprad);
@@ -386,7 +387,13 @@ namespace game
                 particle_splash(PART_WATER, 5, 500, v, 0xFF0000, 0.4f, 500);
                 //gibeffect(qdam, v, (gameent*)o);
             }
-            if(qdam && at==player1)conoutf(CON_GAMEINFO, "-%d", qdam);
+            if(isheadshot(o, v)) {
+                at->headshots++;
+                at->lastdamage=qdam*EXPLOSION_HEADSHOTMUL;
+            } else {
+                at->lastdamage=qdam;
+            }
+            if(qdam && at==player1)conoutf(CON_GAMEINFO, "-%d", at->lastdamage);
         }
     }
 
@@ -518,7 +525,7 @@ namespace game
             if(exploded)
             {
                 if(p.local)
-                    addmsg(N_EXPLODE, "rci3iv", p.owner, lastmillis-maptime, p.atk, p.id-maptime,
+                    addmsg(N_EXPLODE, "rici3iv", p.owner->headshots, p.owner, lastmillis-maptime, p.atk, p.id-maptime,
                             hits.length(), hits.length()*sizeof(hitmsg)/sizeof(int), hits.getbuf());
                 projs.remove(i--);
             }
@@ -540,9 +547,6 @@ namespace game
         }
         adddynlight(vec(to).madd(dir, 4), 10, vec(0.25f, 0.75f, 1.0f), 225, 75);
     }
-
-#define SHOTGUN_HEADSHOTMUL 3
-#define HEADSHOT_DAMAGEMUL 4
 
     void raydamage(vec &from, vec &to, gameent *d, int atk)
     {
@@ -605,7 +609,7 @@ namespace game
             if (d==player1 || d->ai) {
                 if(isheadshot(o, to)) {
                     d->headshots++;
-                    d->lastdamage+=attacks[atk].damage*HEADSHOT_DAMAGEMUL;
+                    d->lastdamage+=attacks[atk].damage*HITSCAN_HEADSHOTMUL;
                 }
                 else d->lastdamage+=attacks[atk].damage;
             }

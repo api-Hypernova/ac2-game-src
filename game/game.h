@@ -125,7 +125,7 @@ static struct _ammodata {
     { 12, 48, "9mm" },
     { 1, 10, "smgnade" },
     { 1, 3, "orb" },
-    { 5, 30, "electrobolt" },
+    { 10, 30, "electrobolt" },
     { 40, 120, "lightning" },
     { 5, 15, "shock" },
     { 1, 10, "rpg_missile" }
@@ -331,12 +331,15 @@ enum
 #define EXP_SELFPUSH 2.5f
 #define EXP_DISTSCALE 0.5f
 #define ATKAMMOTYPE(x) (attacks[(x)].ammotype)
+#define EXPLOSION_HEADSHOTMUL 2
+#define SHOTGUN_HEADSHOTMUL 3
+#define HITSCAN_HEADSHOTMUL 4
 
 static const struct attackinfo { int gun, action, anim, vwepanim, hudanim, sound, attackdelay, damage, spread, margin, projspeed, kickamount, range, rays, hitpush, exprad, ttl, use, switch_when_empty, automatic, ammotype, mods; } attacks[NUMATKS] =
 {
     { GUN_RAIL,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_RAIL1, 900, 75, 0, 0,    0, 5, 2048, 1, 200,  0, 0, 0, 0, 1, AMMO_SHOCK, 0 },
     { GUN_RAIL,  ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 0, 1, AMMO_NONE, 0 },
-    { GUN_PULSE, ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSE1, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 30, 0, 0, 0, 1, AMMO_ELECTROBOLT, 0 },
+    { GUN_PULSE, ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_PULSE1, 700, 70, 0, 1, 1000, 5, 1024, 1, 200, 40, 0, 0, 0, 1, AMMO_ELECTROBOLT, 0 },
     { GUN_PULSE, ACT_SECONDARY, ANIM_MELEE, ANIM_VWEP_MELEE, ANIM_GUN_MELEE, S_MELEE,  500, 1, 0, 2,    0,  0,   14, 1,    0,  0, 0, 0, 1, AMMO_NONE, 0 },
     { GUN_SHOTGUN,  ACT_PRIMARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_PRIMARY, 500, 9, 150, 0,    0, 5, 2048, 6, 200,  0, 0, 0, 1, 0, AMMO_SHELLS, 0 },
     { GUN_SHOTGUN,  ACT_SECONDARY, ANIM_SHOOT, ANIM_VWEP_SHOOT, ANIM_GUN_SHOOT, S_SHOTGUN_SECONDARY, 900, 9, 150, 0,    0, 5, 2048, 12, 200, 0, 0, 0, 1, 0, AMMO_SHELLS, 0 },
