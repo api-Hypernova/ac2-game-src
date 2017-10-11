@@ -1,3 +1,5 @@
+Home of the work-in-progress Tesseract port of Adrenaline Cube 2.
+
 Tesseract is a fork of the Cube 2: Sauerbraten engine. The goal of Tesseract
 is to make mapping more fun by using modern dynamic rendering techniques, so
 that you can get instant feedback on lighting changes, not just geometry.
