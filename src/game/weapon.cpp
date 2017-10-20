@@ -390,9 +390,8 @@ namespace game
             if(isheadshot(o, v)) {
                 at->headshots++;
                 at->lastdamage=qdam*EXPLOSION_HEADSHOTMUL;
-            } else {
-                at->lastdamage=qdam;
-            }
+            } else at->lastdamage=qdam;
+
             if(qdam && at==player1)conoutf(CON_GAMEINFO, "-%d", at->lastdamage);
         }
     }
@@ -667,6 +666,7 @@ namespace game
         }
 
         //if(d==hudplayer()) playsound(attacks[atk].hudsound, NULL);
+        if(atk==ATK_SHOTGUN_SECONDARY) playsound(attacks[ATK_SHOTGUN_PRIMARY].sound, d==hudplayer()?NULL:&d->o); //hack to also play the shotgun primary sound when firing the secondary, because the licenses of the sounds we have don't allow modification
         playsound(attacks[atk].sound, d==hudplayer()?NULL:&d->o);
     }
 

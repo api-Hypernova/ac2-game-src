@@ -396,7 +396,8 @@ namespace game
 
         gameent *h = followingplayer();
         if(!h) h = player1;
-        int contype = d==h || actor==h ? CON_FRAG_SELF : CON_FRAG_OTHER;
+        //int contype = d==h || actor==h ? CON_FRAG_SELF : CON_FRAG_OTHER;
+        int contype = CON_GAMEINFO;
         const char *dname = "", *aname = "";
         if(m_teammode && teamcolorfrags)
         {
