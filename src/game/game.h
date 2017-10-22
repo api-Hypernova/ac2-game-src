@@ -357,11 +357,11 @@ static const struct guninfo { const char *name, *file, *vwep; int attacks[NUMACT
 {
     { "railgun", "railgun", "worldgun/railgun", { -1, ATK_RAIL_SHOOT, ATK_RAIL_MELEE }, },
     { "pulse_rifle", "pulserifle", "worldgun/pulserifle", { -1, ATK_PULSE_SHOOT, ATK_PULSE_MELEE }, },
-    { "shotgun", "shotgun", "worldgun/shotgun", { -1, ATK_SHOTGUN_PRIMARY, ATK_SHOTGUN_SECONDARY } },
-    { "m4", "m4", "worldgun/m4", { -1, ATK_M4_PRIMARY, ATK_M4_SECONDARY } },
-    { "357", "357", "worldgun/357", { -1, ATK_357_PRIMARY, ATK_357_SECONDARY } },
-    { "pistol", "pistol", "worldgun/pistol", { -1, ATK_PISTOL_PRIMARY, ATK_PISTOL_SECONDARY } },
-    { "pulserifle", "pulserifle", "worldgun/pulserifle", { -1, ATK_PULSERIFLE_PRIMARY, ATK_PULSERIFLE_SECONDARY } },
+    { "shotgun", "pulserifle", "worldgun/railgun", { -1, ATK_SHOTGUN_PRIMARY, ATK_SHOTGUN_SECONDARY } },
+    { "m4", "pulserifle", "worldgun/railgun", { -1, ATK_M4_PRIMARY, ATK_M4_SECONDARY } },
+    { "357", "pulserifle", "worldgun/railgun", { -1, ATK_357_PRIMARY, ATK_357_SECONDARY } },
+    { "pistol", "pulserifle", "worldgun/railgun", { -1, ATK_PISTOL_PRIMARY, ATK_PISTOL_SECONDARY } },
+    { "pulserifle", "pulserifle", "worldgun/railgun", { -1, ATK_PULSERIFLE_PRIMARY, ATK_PULSERIFLE_SECONDARY } },
 };
 
 #include "ai.h"

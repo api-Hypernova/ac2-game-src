@@ -304,7 +304,6 @@ namespace game
     {
         if(!blood || !numgibs || damage < 0) return;
         loopi(numgibs) spawnbouncer(from, d, BNC_GIBS);
-        conoutf(CON_GAMEINFO, "Spawned %d gibs...", numgibs);
     }
 
     bool isheadshot(dynent *d, vec to)
