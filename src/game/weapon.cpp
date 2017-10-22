@@ -344,7 +344,7 @@ namespace game
                 damageeffect(damage, f);
                 if(f==player1)
                 {
-                    damageblend(damage);
+                    damageblend(damage/4);
                     damagecompass(damage, at ? at->o : f->o);
                     playsound(S_PAIN2);
                 }

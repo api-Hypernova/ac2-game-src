@@ -340,7 +340,7 @@ namespace game
         }
         if(d==h)
         {
-            damageblend(damage);
+            damageblend(damage/4);
             damagecompass(damage, actor->o);
         }
         damageeffect(damage, d, d!=h);
