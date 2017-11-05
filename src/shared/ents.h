@@ -69,6 +69,7 @@ struct physent                                  // base entity type, can be affe
     int inwater;
     bool jumping;
     char move, strafe, crouching;
+    bool sprinting;
 
     uchar physstate;                            // one of PHYS_* above
     uchar state, editstate;                     // one of CS_* above
@@ -79,6 +80,7 @@ struct physent                                  // base entity type, can be affe
 
     physent() : o(0, 0, 0), deltapos(0, 0, 0), newpos(0, 0, 0), yaw(0), pitch(0), roll(0), maxspeed(100),
                radius(4.1f), eyeheight(18), maxheight(18), aboveeye(2), xradius(4.1f), yradius(4.1f), zmargin(0),
+               sprinting(false),
                state(CS_ALIVE), editstate(CS_ALIVE), type(ENT_PLAYER),
                collidetype(COLLIDE_ELLIPSE),
                blocked(false)

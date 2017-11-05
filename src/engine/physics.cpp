@@ -1774,7 +1774,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
     }
 
     vec d(m);
-    d.mul(pl->maxspeed*1.3f);
+    d.mul(pl->maxspeed*(pl->sprinting?1.3f:1.0f)); //add sprint boost here
     if(pl->type==ENT_PLAYER)
     {
         if(floating)
@@ -2003,6 +2003,7 @@ dir(right,    strafe, -1, k_right, k_left);
 
 ICOMMAND(jump,   "D", (int *down), { if(!*down || game::canjump()) player->jumping = *down!=0; });
 ICOMMAND(crouch, "D", (int *down), { if(!*down) player->crouching = abs(player->crouching); else if(game::cancrouch()) player->crouching = -1; });
+ICOMMAND(sprint, "D", (int *down), { if(!*down || game::cansprint()) player->sprinting=*down!=0; });
 
 bool entinmap(dynent *d, bool avoidplayers)        // brute force but effective way to find a free spawn spot in the map
 {

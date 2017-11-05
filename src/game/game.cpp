@@ -308,6 +308,10 @@ namespace game
         return player1->state!=CS_DEAD;
     }
 
+    bool cansprint() {
+        return canjump();
+    }
+
     bool allowmove(physent *d)
     {
         if(d->type!=ENT_PLAYER) return true;

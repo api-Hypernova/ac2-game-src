@@ -459,7 +459,6 @@ struct gameent : dynent, gamestate
     editinfo *edit;
     float deltayaw, deltapitch, deltaroll, newyaw, newpitch, newroll;
     int smoothmillis;
-    int sprint_left_millis;
     string name, info;
     int team, playermodel, playercolor;
     ai::aiinfo *ai;
