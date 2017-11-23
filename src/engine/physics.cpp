@@ -420,8 +420,8 @@ const float STAIRHEIGHT = 4.1f;
 const float FLOORZ = 0.867f;
 const float SLOPEZ = 0.5f;
 const float WALLZ = 0.2f;
-extern const float JUMPVEL = 125.0f;
-extern const float GRAVITY = 200.0f;
+extern const float JUMPVEL = 80.0f;
+extern const float GRAVITY = 205.0f;
 
 bool ellipseboxcollide(physent *d, const vec &dir, const vec &o, const vec &center, float yaw, float xr, float yr, float hi, float lo)
 {
@@ -1729,6 +1729,8 @@ VARP(maxroll, 0, 0, 20);
 FVAR(straferoll, 0, 0.033f, 90);
 FVAR(faderoll, 0, 0.95f, 1);
 VAR(floatspeed, 1, 100, 10000);
+VARP(autohop, 0, 1, 1);
+VARP(minfricspeed, 0, 60, 9999);
 
 void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curtime)
 {
@@ -1737,7 +1739,6 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
     {
         if(pl->jumping && allowmove)
         {
-            pl->jumping = false;
             pl->vel.z = max(pl->vel.z, JUMPVEL);
         }
     }
@@ -1746,14 +1747,13 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
         if(water && !pl->inwater) pl->vel.div(8);
         if(pl->jumping && allowmove)
         {
-            pl->jumping = false;
-
             pl->vel.z = max(pl->vel.z, JUMPVEL); // physics impulse upwards
             if(water) { pl->vel.x /= 8.0f; pl->vel.y /= 8.0f; } // dampen velocity change even harder, gives correct water feel
 
             game::physicstrigger(pl, local, 1, 0);
         }
     }
+    else if(!autohop) pl->jumping = false; //check when initiating jump for faster check
     if(!floating && pl->physstate == PHYS_FALL) pl->timeinair += curtime;
 
     vec m(0.0f, 0.0f, 0.0f);
@@ -1774,7 +1774,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
     }
 
     vec d(m);
-    d.mul(pl->maxspeed*(pl->sprinting?1.3f:1.0f)); //add sprint boost here
+    d.mul(pl->maxspeed*(pl->sprinting?1.6f:1.0f)); //add sprint boost here
     if(pl->type==ENT_PLAYER)
     {
         if(floating)
@@ -1783,17 +1783,16 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
         }
         else if(pl->crouching && pl->physstate != PHYS_FALL) d.mul(0.4f);
     }
+    //float fric = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
     float fric = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
-    pl->vel.lerp(d, pl->vel, pow(1 - 1/fric, curtime/20.0f));
-// old fps friction
-//    float friction = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
-//    float fpsfric = min(curtime/(20.0f*friction), 1.0f);
-//    pl->vel.lerp(pl->vel, d, fpsfric);
+
+    if(pl->physstate!=PHYS_FALL || pl->vel.magnitude2()<minfricspeed)pl->vel.lerp(d, pl->vel, pow(1 - 1/fric, curtime/20.0f));
 }
 
 void modifygravity(physent *pl, bool water, int curtime)
 {
-    float secs = curtime/1000.0f;
+    float secs = curtime/650.0f; // 650
+    if(pl->vel.magnitude2()<minfricspeed) secs = curtime/1000.f;
     vec g(0, 0, 0);
     if(pl->physstate == PHYS_FALL) g.z -= GRAVITY*secs;
     else if(pl->floor.z > 0 && pl->floor.z < FLOORZ)

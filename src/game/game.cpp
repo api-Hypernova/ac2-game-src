@@ -299,7 +299,7 @@ namespace game
     {
         if(!connected || intermission) return false;
         respawn();
-        return player1->state!=CS_DEAD;
+        return player1->state!=CS_DEAD && player1->physstate;
     }
 
     bool cancrouch()
@@ -714,7 +714,7 @@ namespace game
 
             char hudstr[20];
             loopi(ARRSIZE(guns[d->gunselect].attacks)) {
-                concformatstring(hudstr, "%d|", d->ammo[ATKAMMOTYPE(guns[d->gunselect].attacks[i])]);
+                concformatstring(hudstr, "%d%s", d->ammo[ATKAMMOTYPE(guns[d->gunselect].attacks[i])], i<ARRSIZE(guns[d->gunselect].attacks-1) ? "|" : "");
             }
             concatstring(hudstr, "\0");
             draw_textf("%s", (HICON_X + 4*HICON_STEP + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, hudstr);
