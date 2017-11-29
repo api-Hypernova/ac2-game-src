@@ -67,6 +67,7 @@ struct physent                                  // base entity type, can be affe
     float xradius, yradius, zmargin;
     vec floor;                                  // the normal of floor the dynent is on
 
+    float lastyaw;
     int inwater;
     bool jumping;
     char move, strafe, crouching;
