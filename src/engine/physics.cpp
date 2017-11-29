@@ -5,6 +5,7 @@
 
 #include "engine.h"
 #include "mpr.h"
+//#include <math.h>
 
 const int MAXCLIPPLANES = 1024;
 static clipplanes clipcache[MAXCLIPPLANES];
@@ -421,7 +422,7 @@ const float FLOORZ = 0.867f;
 const float SLOPEZ = 0.5f;
 const float WALLZ = 0.2f;
 extern const float JUMPVEL = 80.0f;
-extern const float GRAVITY = 205.0f;
+extern const float GRAVITY = 200.0f;
 
 bool ellipseboxcollide(physent *d, const vec &dir, const vec &o, const vec &center, float yaw, float xr, float yr, float hi, float lo)
 {
@@ -1753,7 +1754,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
             game::physicstrigger(pl, local, 1, 0);
         }
     }
-    else if(!autohop) pl->jumping = false; //check when initiating jump for faster check
+    else if(!autohop) pl->jumping = false;
     if(!floating && pl->physstate == PHYS_FALL) pl->timeinair += curtime;
 
     vec m(0.0f, 0.0f, 0.0f);
@@ -1782,6 +1783,8 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
             if(pl==player) d.mul(floatspeed/100.0f);
         }
         else if(pl->crouching && pl->physstate != PHYS_FALL) d.mul(0.4f);
+        if(abs(pl->lastyaw-pl->yaw)>1 && abs(pl->lastyaw-pl->yaw)<12 && pl->move && pl->strafe)d.mul(abs(pl->lastyaw-pl->yaw)/2.3);
+        pl->lastyaw = pl->yaw;
     }
     //float fric = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
     float fric = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
@@ -1791,7 +1794,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
 
 void modifygravity(physent *pl, bool water, int curtime)
 {
-    float secs = curtime/650.0f; // 650
+    float secs = curtime/650.0f;
     if(pl->vel.magnitude2()<minfricspeed) secs = curtime/1000.f;
     vec g(0, 0, 0);
     if(pl->physstate == PHYS_FALL) g.z -= GRAVITY*secs;
