@@ -2137,9 +2137,9 @@ namespace server
         servstate &gs = ci->state;
         switch(atk)
         {
-            case ATK_PULSE_SHOOT:
-                if(!gs.projs.remove(id)) return;
-                break;
+//            case ATK_PULSE_SHOOT:
+//                if(!gs.projs.remove(id)) return;
+//                break;
 
             default:
                 return;
@@ -2183,7 +2183,7 @@ namespace server
         gs.shotdamage += attacks[atk].damage*attacks[atk].rays;
         switch(atk)
         {
-            case ATK_PULSE_SHOOT: gs.projs.add(id); break;
+//            case ATK_PULSE_SHOOT: gs.projs.add(id); break;
             default:
             {
                 int totalrays = 0, maxrays = attacks[atk].rays;
@@ -2861,8 +2861,7 @@ namespace server
                 {
                     if((!ci->local || demorecord || hasnonlocalclients()) && (cp->state.state==CS_ALIVE || cp->state.state==CS_EDITING))
                     {
-                        if(!ci->local && !m_edit && max(vel.magnitude2(), (float)fabs(vel.z)) >= 180)
-                            cp->setexceeded();
+                            //cp->setexceeded();
                         cp->position.setsize(0);
                         while(curmsg<p.length()) cp->position.add(p.buf[curmsg++]);
                     }

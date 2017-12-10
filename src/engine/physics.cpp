@@ -1787,8 +1787,13 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
         pl->lastyaw = pl->yaw;
     }
     //float fric = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
-    float fric = water && !floating ? 20.0f : (pl->physstate >= PHYS_SLOPE || floating ? 6.0f : 30.0f);
+    float fric = 0.f;
+    if(water && !floating) fric = 20.0f;
+    else if(pl->physstate >= PHYS_SLOPE || floating) fric = 6.0f;
+    //else if(pl->physstate >= PHYS_SLOPE && pl->crouching) fric = 10.f;
+    else fric = 30.0f;
 
+    //static const char * const states[] = {"float", "fall", "slide", "slope", "floor", "step up", "step down", "bounce"};
     if(pl->physstate!=PHYS_FALL || pl->vel.magnitude2()<minfricspeed)pl->vel.lerp(d, pl->vel, pow(1 - 1/fric, curtime/20.0f));
 }
 
