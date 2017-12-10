@@ -100,6 +100,7 @@ namespace game
         int s = d->gunselect;
         if(s!=GUN_SHOTGUN && d->hasammo(GUN_SHOTGUN))  s = GUN_SHOTGUN;
         else if(s!=GUN_M4 && d->hasammo(GUN_M4))  s = GUN_M4;
+        else if(s!=GUN_PULSERIFLE && d->hasammo(GUN_PULSERIFLE))  s = GUN_PULSERIFLE;
         else if(s!=GUN_357 && d->hasammo(GUN_357))  s = GUN_357;
         else if(s!=GUN_PISTOL && d->hasammo(GUN_PISTOL))  s = GUN_PISTOL;
         gunselect(s, d);
