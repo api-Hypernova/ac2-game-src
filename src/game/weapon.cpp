@@ -98,9 +98,7 @@ namespace game
     {
         if(d->state!=CS_ALIVE) return;
         int s = d->gunselect;
-        if(s!=GUN_PULSE && d->hasammo(GUN_PULSE))     s = GUN_PULSE;
-        else if(s!=GUN_RAIL && d->hasammo(GUN_RAIL))  s = GUN_RAIL;
-        else if(s!=GUN_SHOTGUN && d->hasammo(GUN_SHOTGUN))  s = GUN_SHOTGUN;
+        if(s!=GUN_SHOTGUN && d->hasammo(GUN_SHOTGUN))  s = GUN_SHOTGUN;
         else if(s!=GUN_M4 && d->hasammo(GUN_M4))  s = GUN_M4;
         else if(s!=GUN_357 && d->hasammo(GUN_357))  s = GUN_357;
         else if(s!=GUN_PISTOL && d->hasammo(GUN_PISTOL))  s = GUN_PISTOL;
@@ -440,20 +438,20 @@ namespace game
         if(local) return;
         switch(atk)
         {
-            case ATK_PULSE_SHOOT:
-                loopv(projs)
-                {
-                    projectile &p = projs[i];
-                    if(p.atk == atk && p.owner == d && p.id == id && !p.local)
-                    {
-                        vec pos = vec(p.offset).mul(p.offsetmillis/float(OFFSETMILLIS)).add(p.o);
-                        explode(p.local, p.owner, pos, p.dir, NULL, 0, atk);
-                        pulsestain(p, pos);
-                        projs.remove(i);
-                        break;
-                    }
-                }
-                break;
+            //case ATK_PULSE_SHOOT:
+//                loopv(projs)
+//                {
+//                    projectile &p = projs[i];
+//                    if(p.atk == atk && p.owner == d && p.id == id && !p.local)
+//                    {
+//                        vec pos = vec(p.offset).mul(p.offsetmillis/float(OFFSETMILLIS)).add(p.o);
+//                        explode(p.local, p.owner, pos, p.dir, NULL, 0, atk);
+//                        pulsestain(p, pos);
+//                        projs.remove(i);
+//                        break;
+//                    }
+//                }
+//                break;
             default:
                 break;
         }
@@ -625,7 +623,6 @@ namespace game
 
         switch(atk)
         {
-            case ATK_PULSE_SHOOT:
             case ATK_M4_SECONDARY:
             case ATK_PULSERIFLE_SECONDARY:
                 if(d->muzzle.x >= 0)
@@ -633,7 +630,6 @@ namespace game
                 newprojectile(from, to, attacks[atk].projspeed, local, id, d, atk);
                 break;
 
-            case ATK_RAIL_SHOOT:
             case ATK_M4_PRIMARY:
             case ATK_357_PRIMARY:
             case ATK_357_SECONDARY:
@@ -786,7 +782,7 @@ namespace game
         loopv(projs)
         {
             projectile &p = projs[i];
-            if(p.atk!=ATK_PULSE_SHOOT) continue;
+//            if(p.atk!=ATK_PULSE_SHOOT) continue;
             vec pos(p.o);
             pos.add(vec(p.offset).mul(p.offsetmillis/float(OFFSETMILLIS)));
             adddynlight(pos, 20, vec(0.25f, 0.75f, 1.0f));

@@ -111,7 +111,7 @@ namespace ai
     vec getaimpos(gameent *d, int atk, gameent *e)
     {
         vec o = e->o;
-        if(atk == ATK_PULSE_SHOOT) o.z += (e->aboveeye*0.2f)-(0.8f*d->eyeheight);
+        if(atk == ATK_M4_SECONDARY) o.z += (e->aboveeye*0.2f)-(0.8f*d->eyeheight);
         else o.z += (e->aboveeye-e->eyeheight)*0.5f;
         if(d->skill <= 100)
         {
@@ -120,13 +120,11 @@ namespace ai
                 int aiskew = 1;
                 switch(atk)
                 {
-                    case ATK_RAIL_SHOOT:
                     case ATK_SHOTGUN_PRIMARY:
                     case ATK_SHOTGUN_SECONDARY:
                     case ATK_M4_PRIMARY:
                     case ATK_357_PRIMARY:
                         aiskew = 5; break;
-                    case ATK_PULSE_SHOOT:
                     case ATK_M4_SECONDARY:
                     case ATK_357_SECONDARY:
                         aiskew = 20; break;
@@ -398,7 +396,7 @@ namespace ai
         return false;
     }
 
-    int isgoodammo(int gun) { return gun == GUN_PULSE || gun == GUN_RAIL || gun == GUN_SHOTGUN || gun == GUN_M4 || gun == GUN_357; }
+    int isgoodammo(int gun) { return gun == GUN_SHOTGUN || gun == GUN_M4 || gun == GUN_357; }
 
     bool hasgoodammo(gameent *d)
     {
@@ -1132,7 +1130,7 @@ namespace ai
         gameent *e = getclient(d->ai->enemy);
         if(!d->hasammo(d->gunselect) || !hasrange(d, e, d->gunselect) || (d->gunselect != d->ai->weappref && (!isgoodammo(d->gunselect) || d->hasammo(d->ai->weappref))))
         {
-            static const int gunprefs[] = { GUN_M4, GUN_SHOTGUN, GUN_PULSE, GUN_RAIL, GUN_357 };
+            static const int gunprefs[] = { GUN_M4, GUN_SHOTGUN, GUN_357 };
             int gun = -1;
             if(d->hasammo(d->ai->weappref) && hasrange(d, e, d->ai->weappref)) gun = d->ai->weappref;
             else
